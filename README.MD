@@ -52,4 +52,5 @@ docker-compose down
 ### API Endpoints
 - `GET /` - Hello World
 - `GET /api/health` - Health check
-- `GET /api/crmv/<numero>` - Buscar CRMV por número
+- `GET /api/crmv/<numero>/<estado>` - Buscar CRMV por número e estado
+- `GET /apidocs/` - Documentação Swagger da API
