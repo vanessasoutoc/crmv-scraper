@@ -1,0 +1,40 @@
+name: PRODUCTION
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: copy file via ssh password
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        remote_path: /docker-images/crmv
+        host: ${{secrets.SSH_HOST}}
+        username: ${{ secrets.REMOTE_KEY }}
+        port: 22
+        password: ${{ secrets.REMOTE_KEY_PASS }}
+        source: "*"
+        target: /docker-images/crmv
+        overwrite: true
+
+  build:
+    name: Build
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Run Docker CMD
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.REMOTE_KEY }}
+        password: ${{ secrets.REMOTE_KEY_PASS }}
+        port: 22
+        script: |
+          cd /docker-images/crmv && \
+          docker-compose down --remove-orphans && \ 
+          docker-compose up --build -d
